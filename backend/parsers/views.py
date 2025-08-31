@@ -34,4 +34,4 @@ def scraping_view(request):
     else:
         # We only need to render the HTML template here.
         # The form is now handled by the JavaScript in the frontend.
-        return render(request, 'parsers/web_scraper.html')
+        return render(request, 'parsers/webscraper.html')

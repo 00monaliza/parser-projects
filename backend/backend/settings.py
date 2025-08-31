@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "parser_app",
+    'parsers',
 
     # third-party
     'rest_framework',
