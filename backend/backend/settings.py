@@ -1,9 +1,5 @@
 import os
 from pathlib import Path
-import sys
-import os
-
-sys.path.append(os.path.join(BASE_DIR, ".."))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
