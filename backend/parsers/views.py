@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ScrapingForm
-from .scraper_logic import run_scraper_logic  # Import the core scraping function
+from .scraper_logic import run_scraper_logic  
 
 def scraping_view(request):
     if request.method == 'POST':
@@ -30,4 +30,4 @@ def scraping_view(request):
             return JsonResponse({'status': 'error', 'message': 'Неверные данные формы.'}, status=400)
     else:
         form = ScrapingForm()
-        return render(request, 'parsers/index.html', {'form': form})
+        return render(request, 'parsers/templates/index.html', {'form': form})

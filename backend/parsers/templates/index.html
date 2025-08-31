@@ -1,5 +1,132 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Начать парсинг</button>
-</form>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Парсер веб-сайтов</h1>
+        <p class="text-center text-gray-500 mb-8">
+            Введите URL и выберите поля, чтобы начать.
+        </p>
+
+        <form id="scraper-form" class="space-y-6">
+            <div>
+                <label for="url-input" class="block text-sm font-medium text-gray-700">URL сайта</label>
+                <div class="mt-1">
+                    <input type="url" id="url-input" name="url" placeholder="https://example.com/products" required
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-3 transition duration-150 ease-in-out">
+                </div>
+            </div>
+
+            <div>
+                <label for="fields-input" class="block text-sm font-medium text-gray-700">Поля для парсинга (через запятую)</label>
+                <p class="text-xs text-gray-500">Например: название, цена, артикул, фото</p>
+                <div class="mt-1">
+                    <input type="text" id="fields-input" name="fields" placeholder="title, price, description" required
+                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-3 transition duration-150 ease-in-out">
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-center">
+                <button type="submit" id="submit-button"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    <span id="button-text">Начать парсинг</span>
+                    <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.966l1-2.675z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <div id="results-container" class="mt-8 hidden">
+            <h2 class="text-xl font-semibold mb-4 text-center">Результаты</h2>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p id="status-message" class="text-center text-gray-600"></p>
+                <div id="download-link" class="mt-4 text-center hidden">
+                    <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">Скачать файл (xlsx)</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('scraper-form');
+        const urlInput = document.getElementById('url-input');
+        const fieldsInput = document.getElementById('fields-input');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const resultsContainer = document.getElementById('results-container');
+        const statusMessage = document.getElementById('status-message');
+        const downloadLink = document.getElementById('download-link');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = urlInput.value;
+            const fields = fieldsInput.value;
+
+            // Show loading state
+            submitButton.disabled = true;
+            buttonText.textContent = 'Парсинг...';
+            loadingSpinner.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+
+            try {
+                // Here you would make a fetch request to your Django backend.
+                // For this example, we'll just simulate a delay and a response.
+                // Replace this with your actual endpoint.
+                
+                // const response = await fetch('/api/parse-site/', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         // Add CSRF token if needed
+                //     },
+                //     body: JSON.stringify({ url: url, fields: fields })
+                // });
+
+                // const data = await response.json();
+                
+                // Simulating a network request and response
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Mock response
+                const mockData = { 
+                    status: 'success', 
+                    message: `Парсинг ${url} завершен. Сохранено 14 записей.`,
+                    filePath: 'quotes_toscrape_com.xlsx'
+                };
+                
+                statusMessage.textContent = mockData.message;
+                downloadLink.querySelector('a').href = mockData.filePath;
+                downloadLink.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Ошибка парсинга:', error);
+                statusMessage.textContent = 'Произошла ошибка при парсинге.';
+                downloadLink.classList.add('hidden');
+            } finally {
+                // Hide loading state
+                submitButton.disabled = false;
+                buttonText.textContent = 'Начать парсинг';
+                loadingSpinner.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
