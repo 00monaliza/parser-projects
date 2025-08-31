@@ -9,6 +9,17 @@ from .serializers import ScrapeJobSerializer, ScrapeResultSerializer
 import threading
 from webscraper.scraper import scrape_url  # our scraper function (sync)
 from .exporter import export_to_xlsx_bytes  # helper to create xlsx bytes
+from django.http import JsonResponse
+from webscraper.scraper import scrape_url   
+
+def scrape_view(request):
+    url = request.GET.get("url")
+    if not url:
+        return JsonResponse({"error": "URL is required"}, status=400)
+
+    data = scrape_url(url)
+    return JsonResponse({"data": data})
+
 
 class JobListCreateAPIView(generics.ListCreateAPIView):
     queryset = ScrapeJob.objects.all().order_by('-created_at')
