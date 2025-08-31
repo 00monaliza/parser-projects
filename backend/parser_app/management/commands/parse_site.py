@@ -4,7 +4,7 @@ import pandas as pd
 from django.core.management.base import BaseCommand
 from parser_app.models import ParsedData
 from parsers.playwright_parser import parse_with_playwright
-
+from urllib.parse import urlparse  
 
 class Command(BaseCommand):
     help = "Парсит сайт и сохраняет данные в БД + XLSX/CSV/JSON"
@@ -78,12 +78,17 @@ class Command(BaseCommand):
 
         df = pd.DataFrame(data)
 
+        # Получаем домен и формируем имя файла
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.replace('.', '_')
+        filename = f"{domain}.{export_format}"
+
         if export_format == "xlsx":
-            df.to_excel("parsed_data.xlsx", index=False)
-            self.stdout.write(self.style.SUCCESS("Экспортировано в parsed_data.xlsx"))
+            df.to_excel(filename, index=False)
+            self.stdout.write(self.style.SUCCESS(f"Экспортировано в {filename}"))
         elif export_format == "csv":
-            df.to_csv("parsed_data.csv", index=False)
-            self.stdout.write(self.style.SUCCESS("Экспортировано в parsed_data.csv"))
+            df.to_csv(filename, index=False)
+            self.stdout.write(self.style.SUCCESS(f"Экспортировано в {filename}"))
         elif export_format == "json":
-            df.to_json("parsed_data.json", orient="records", force_ascii=False, indent=2)
-            self.stdout.write(self.style.SUCCESS("Экспортировано в parsed_data.json"))
+            df.to_json(filename, orient="records", force_ascii=False, indent=2)
+            self.stdout.write(self.style.SUCCESS(f"Экспортировано в {filename}"))
