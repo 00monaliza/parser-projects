@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .forms import ScrapingForm
-from .scraper_logic import run_scraper_logic  
+from .scraper_logic import run_scraper_logic
 
+@csrf_exempt  # This decorator is for demonstration. For production, use CSRF tokens.
 def scraping_view(request):
+    # This path handles form submission via POST
     if request.method == 'POST':
         form = ScrapingForm(request.POST)
         if form.is_valid():
@@ -28,6 +30,8 @@ def scraping_view(request):
                 }, status=500)
         else:
             return JsonResponse({'status': 'error', 'message': 'Неверные данные формы.'}, status=400)
+    # This path handles initial page load via GET
     else:
-        form = ScrapingForm()
-        return render(request, 'parsers/templates/index.html', {'form': form})
+        # We only need to render the HTML template here.
+        # The form is now handled by the JavaScript in the frontend.
+        return render(request, 'parsers/web_scraper.html')
