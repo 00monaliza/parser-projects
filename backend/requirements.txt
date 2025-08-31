@@ -1,3 +1,8 @@
-Django==5.0.3
-playwright==1.44.0
-requests==2.31.0
+Django>=4.2
+djangorestframework
+playwright
+beautifulsoup4
+lxml
+httpx
+pandas
+openpyxl
