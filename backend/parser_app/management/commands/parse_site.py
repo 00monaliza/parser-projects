@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from django.core.management.base import BaseCommand
 from parser_app.models import ParsedData
+from parsers.playwright_parser import parse_with_playwright
+
 
 class Command(BaseCommand):
     help = "Парсит сайт и сохраняет данные в БД + XLSX/CSV/JSON"
@@ -11,21 +13,32 @@ class Command(BaseCommand):
         parser.add_argument("url", type=str, help="URL для парсинга")
         parser.add_argument("--format", type=str, choices=["xlsx", "csv", "json"], default="xlsx",
                             help="Формат выгрузки (xlsx, csv, json)")
+        parser.add_argument("--dynamic", action="store_true", help="Использовать Playwright для парсинга динамических сайтов")
 
     def handle(self, *args, **options):
         url = options["url"]
         export_format = options["format"]
+        use_dynamic = options["dynamic"]
 
-        self.stdout.write(self.style.SUCCESS(f"Парсим: {url}"))
+        self.stdout.write(self.style.SUCCESS(f"Парсим: {url} (dynamic={use_dynamic})"))
 
-        try:
-            response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-            response.raise_for_status()
-        except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Ошибка при запросе: {e}"))
-            return
+        # Если указан --dynamic → используем Playwright
+        if use_dynamic:
+            try:
+                html = parse_with_playwright(url, wait_selector="div")
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Ошибка Playwright: {e}"))
+                return
+        else:
+            try:
+                response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, verify=False)
+                response.raise_for_status()
+                html = response.text
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Ошибка при запросе: {e}"))
+                return
 
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(html, "html.parser")
 
         # Простейшая логика авто-определения
         title = soup.find("h1")
@@ -50,7 +63,7 @@ class Command(BaseCommand):
             title=title,
             price=price,
             image_url=image,
-            raw_html=response.text[:2000]  # для отладки сохраняем кусок
+            raw_html=html[:2000]
         )
 
         self.stdout.write(self.style.SUCCESS(f"Сохранено: {parsed.id} — {parsed.title}"))
