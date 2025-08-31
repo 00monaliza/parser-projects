@@ -1,20 +1,47 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-*.sqlite3
+*.so
+*.egg-info/
+.eggs/
 
-# Virtual env
+# Logs
+*.log
+*.out
+*.err
+
+# Virtual environment
+venv/
+.env/
 .venv/
 
-# VSCode
+# IDE/Editor
 .vscode/
+.idea/
+*.swp
+*.swo
 
-# Node.js
-node_modules/
-npm-debug.log
-yarn-error.log
+# Django
+db.sqlite3
+/media/
+staticfiles/
+*.pot
+*.pyc
 
-# Playwright cache
-.playwright/
+# Playwright
+/playwright-report/
+/playwright/.cache/
+/test-results/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Cache
+__pycache__/
+.cache/
